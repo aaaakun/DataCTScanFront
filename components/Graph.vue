@@ -32,13 +32,13 @@
 
     @Emit()
     delayDaysCal(snapshotDate) {
-      Math.ceil((new Date().getTime()-snapshotDate.getTime())/86400000);
+      Math.floor((new Date().getTime()-snapshotDate.getTime())/86400000);
     }
 
     @Watch('graphData')
     onGraphDataChange (data) {
       data.nodes.forEach(node => {
-        const delayDays = Math.ceil((new Date().getTime()-node.snapshotDate.getTime())/86400000);
+        const delayDays = this.delayDaysCal(node.snapshotDate);
         node.label = node.name;
         node.delayDays = delayDays;
         node.description = `delay: ${delayDays} days`;
