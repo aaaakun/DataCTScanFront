@@ -32,20 +32,40 @@ module.exports = {
   */
   plugins: [
     '@/plugins/element-ui',
-    '@/plugins/antv-g6'
+    '@/plugins/antv-g6',
+    '@/plugins/vue-async-computed',
   ],
   /*
   ** Nuxt.js dev-modules
   */
   buildModules: [
+    '@nuxtjs/dotenv'
   ],
+
+  /*
+  ** dotenv options
+  */
+  dotenv: {
+  },
   /*
   ** Nuxt.js modules
   */
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
+    '@nuxtjs/apollo'
   ],
+
+  /*
+  ** apollo module configuration
+  ** See https://github.com/nuxt-community/apollo-module
+  */
+  apollo: {
+    clientConfigs: {
+      default: '~/apollo/client-configs/default.js'
+    }
+  },
+
   /*
   ** Axios module configuration
   ** See https://axios.nuxtjs.org/options

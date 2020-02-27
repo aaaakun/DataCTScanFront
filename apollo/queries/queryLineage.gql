@@ -1,0 +1,61 @@
+query lineage(
+  $realm: Realm!
+  $snapshotDate: Date!
+  $job: JobQueryInput
+  $ddb: DDBInput
+  $edx: EDXInput
+  $glue: GlueInput
+  $s3: S3Input
+  $completeTime: DateTime!
+) {
+  lineage (
+    input: {
+      realm: $realm
+      snapshotDate: $snapshotDate
+      job: $job
+      ddb: $ddb
+      edx: $edx
+      glue: $glue
+      s3: $s3
+    },
+    completeTime: $completeTime
+  ) {
+    nodes {
+      id
+      name
+      teamName
+      snapshotDate
+      completeTime
+      storage {
+        __typename
+        ... on EDX {
+          provider
+          subject
+          dataset
+        }
+        ... on DDB {
+          AWSAccount
+          AWSRegion
+          table
+        }
+        ... on Glue {
+          AWSAccount
+          AWSRegion
+          database
+          table
+        }
+        ... on S3 {
+          s3Bucket
+          s3Prefix
+        }
+        ... on JobRef {
+          codeRef
+        }
+      }
+    }
+    edges {
+      target
+      source
+    }
+  }
+}

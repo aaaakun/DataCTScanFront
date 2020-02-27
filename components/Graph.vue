@@ -32,7 +32,7 @@
 
     @Emit()
     delayDaysCal(snapshotDate) {
-      Math.floor((new Date().getTime()-snapshotDate.getTime())/86400000);
+      return Math.floor((new Date().getTime() - snapshotDate.getTime())/86400000);
     }
 
     @Watch('graphData')
@@ -42,28 +42,7 @@
         node.label = node.name;
         node.delayDays = delayDays;
         node.description = `delay: ${delayDays} days`;
-        if (delayDays < 3) {
-          node.preRect = {
-            fill: "#67C23A"
-          };
-          node.stateIcon = {
-            img: require('~/assets/img/success.svg'),
-          }
-        } else if (delayDays < 5) {
-          node.preRect = {
-            fill: "#E6A23C"
-          };
-          node.stateIcon = {
-            img: require('~/assets/img/warn.svg'),
-          }
-        } else {
-          node.preRect = {
-            fill: "#F56C6C"
-          };
-          node.stateIcon = {
-            img: require('~/assets/img/error.svg'),
-          }
-        }
+        
         switch (node.storage.__typename) {
           case 'DDB': {
             node.logoIcon = {
@@ -72,6 +51,9 @@
               height: 30,
               offset: -15
             }
+            node.style = {
+              fill: "#F2C9E0"
+            };
             break;
           }
 
@@ -82,6 +64,9 @@
               height: 30,
               offset: -15
             }
+            node.style = {
+              fill: "#BFC0FF"
+            };
             break;
           }
 
@@ -92,6 +77,9 @@
               height: 30,
               offset: -15
             }
+            node.style = {
+              fill: "#CBFFC9"
+            };
             break;
           }
 
@@ -102,6 +90,9 @@
               height: 30,
               offset: -15
             }
+            node.style = {
+              fill: "#A69E8F"
+            };
             break;
           }
 
@@ -112,7 +103,30 @@
               height: 30,
               offset: -15
             }
+            node.style = {
+              fill: "#C9F9FF"
+            };
             break;
+          }
+        }
+
+        if (delayDays < 3) {
+          node.stateIcon = {
+            img: require('~/assets/img/success.svg'),
+          }
+        } else if (delayDays < 5) {
+          node.style = {
+            fill: "#F2C53D"
+          };
+          node.stateIcon = {
+            img: require('~/assets/img/warn.svg'),
+          }
+        } else {
+          node.style = {
+            fill: "#F23E2E"
+          };
+          node.stateIcon = {
+            img: require('~/assets/img/error.svg'),
           }
         }
       });
@@ -139,7 +153,7 @@
             
           },
           modes: {
-            default: [ 'drag-canvas', 'activate-relations' ]
+            default: [ 'drag-canvas', 'activate-relations', 'zoom-canvas' ]
           },
           defaultNode: {
             type: 'modelRect',
@@ -148,15 +162,14 @@
           nodeStateStyles: {
             hover: {
               lineWidth: 2,
-              stroke: '#1890ff',
-              fill: '#e6f7ff'
+              stroke: '#1890ff'
             },
             active: {
-              opacity: 1,
-              fill: '#e6f7ff'
+              opacity: 1
             },
             inactive: {
-              opacity: 0.2
+              opacity: 0.2,
+              fill: '#ffffff'
             }
           },
           defaultEdge: {

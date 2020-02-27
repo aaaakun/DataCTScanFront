@@ -1,0 +1,7 @@
+query workflowVersions(
+  $realm: Realm!
+  $namespace: String!
+  $shortName: String!
+) {
+  workflowVersions(realm: $realm, namespace: $namespace, shortName: $shortName)
+}

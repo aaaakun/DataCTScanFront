@@ -1,0 +1,20 @@
+query completeTimes($realm: Realm!, 
+                    $snapshotDate: Date!, 
+                    $job:JobQueryInput, 
+                    $ddb: DDBInput, 
+                    $edx: EDXInput,
+                    $glue: GlueInput, 
+                    $s3: S3Input) 
+{
+  completeTimes(
+    input: {
+      realm: $realm
+      snapshotDate: $snapshotDate
+      job: $job,
+      ddb: $ddb,
+      edx: $edx,
+      glue: $glue,
+      s3: $s3
+    }
+  )
+}

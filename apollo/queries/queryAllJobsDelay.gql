@@ -1,0 +1,9 @@
+query allJobsDelay($realm: Realm!) {
+  allJobsDelay(
+    realm: $realm
+  ) {
+    snapshotDate,
+    delayDays,
+    name
+  }
+}

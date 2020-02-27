@@ -1,0 +1,47 @@
+query timeWindowGraph($realm: Realm!, $startTime: DateTime!, $endTime: DateTime!) {
+    timeWindowGraph(
+      input: {
+        realm: $realm,
+        startTime: $startTime,
+        endTime: $endTime
+      }
+    ) {
+      nodes {
+        id,
+        name,
+        teamName,
+        snapshotDate,
+        completeTime,
+        storage {
+          __typename,
+          ... on EDX {
+            provider,
+            subject,
+            dataset,
+          },
+          ... on DDB {
+            AWSAccount,
+            AWSRegion,
+            table
+          },
+          ... on Glue {
+            AWSAccount,
+            AWSRegion,
+            database,
+            table
+          },
+          ... on S3 {
+            s3Bucket,
+            s3Prefix
+          }
+          ... on JobRef {
+            codeRef
+          }
+        }
+      },
+      edges {
+        target,
+        source
+      }
+    }
+  }

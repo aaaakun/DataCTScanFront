@@ -8,25 +8,29 @@
     "dev": "cross-env NODE_ENV=development nodemon server/index.js --watch server",
     "build": "nuxt build",
     "start": "cross-env NODE_ENV=production node server/index.js",
-    "generate": "nuxt generate"
+    "generate": "nuxt generate",
+    "build-fragment": "node apollo/schemaQuery.js"
   },
   "dependencies": {
     "@antv/data-set": "^0.11.1",
     "@antv/g2": "^3.5.12",
     "@antv/g6": "^3.3.0",
+    "@nuxtjs/apollo": "^4.0.0-rc19",
     "@nuxtjs/axios": "^5.9.5",
     "axios": "^0.19.2",
-    "cross-env": "^5.2.0",
     "element-ui": "^2.4.11",
     "express": "^4.16.4",
+    "graphql-tag": "^2.10.3",
     "insert-css": "^2.0.0",
     "nuxt": "^2.0.0",
     "nuxt-property-decorator": "^2.5.1",
     "webpack": "^4.41.6"
   },
   "devDependencies": {
+    "@nuxtjs/dotenv": "^1.4.1",
     "coffee-loader": "^0.9.0",
     "coffeescript": "^2.5.1",
+    "cross-env": "^5.2.1",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-prettier": "^3.1.2",
     "node-sass": "^4.13.1",

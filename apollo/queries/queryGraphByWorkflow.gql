@@ -1,0 +1,51 @@
+query workflowGraph(
+  $realm: Realm!
+  $namespace: String!
+  $shortName: String!
+  $version: Int!
+) {
+  workflowGraph(
+    realm: $realm
+    namespace: $namespace
+    shortName: $shortName
+    version: $version
+  ) {
+    nodes {
+      id
+      name
+      teamName
+      snapshotDate
+      completeTime
+      storage {
+        __typename
+        ... on EDX {
+          provider
+          subject
+          dataset
+        }
+        ... on DDB {
+          AWSAccount
+          AWSRegion
+          table
+        }
+        ... on Glue {
+          AWSAccount
+          AWSRegion
+          database
+          table
+        }
+        ... on S3 {
+          s3Bucket
+          s3Prefix
+        }
+        ... on JobRef {
+          codeRef
+        }
+      }
+    }
+    edges {
+      target
+      source
+    }
+  }
+}
