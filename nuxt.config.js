@@ -32,8 +32,7 @@ module.exports = {
   */
   plugins: [
     '@/plugins/element-ui',
-    '@/plugins/antv-g6',
-    '@/plugins/vue-async-computed',
+    '@/plugins/antv-g6'
   ],
   /*
   ** Nuxt.js dev-modules

@@ -1,6 +1,8 @@
-query allJobsDelay($realm: Realm!) {
+query allJobsDelay($realm: Realm!, $startDate: Date!, $endDate: Date!) {
   allJobsDelay(
-    realm: $realm
+    realm: $realm,
+    startDate: $startDate,
+    endDate: $endDate
   ) {
     snapshotDate,
     delayDays,

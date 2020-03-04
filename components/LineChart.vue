@@ -5,7 +5,6 @@
 </template>
 <script>
 import Vue from 'vue'
-import { mapActions } from 'vuex'
 import {
   Component,
   Getter,
@@ -30,7 +29,7 @@ export default class LineChart extends Vue {
   @Watch('chartData')
   onChartDataChange(value) {
     if(this.chartData)
-      this.chartData.changeData(value)
+      this.chart.changeData(value)
   }
 
   mounted() {

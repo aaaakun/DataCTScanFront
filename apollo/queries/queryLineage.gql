@@ -7,6 +7,8 @@ query lineage(
   $glue: GlueInput
   $s3: S3Input
   $completeTime: DateTime!
+  $showSuccessors: Boolean!
+  $showPredecessors: Boolean!
 ) {
   lineage (
     input: {
@@ -19,6 +21,8 @@ query lineage(
       s3: $s3
     },
     completeTime: $completeTime
+    showSuccessors: $showSuccessors
+    showPredecessors: $showPredecessors
   ) {
     nodes {
       id
@@ -50,6 +54,7 @@ query lineage(
         }
         ... on JobRef {
           codeRef
+          startTime
         }
       }
     }

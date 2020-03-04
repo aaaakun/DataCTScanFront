@@ -40,6 +40,7 @@ query workflowGraph(
         }
         ... on JobRef {
           codeRef
+          startTime
         }
       }
     }

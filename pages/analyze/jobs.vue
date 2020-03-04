@@ -1,32 +1,100 @@
 <template>
   <div class="jobs">
-    <line-chart v-bind:chartData="chartData" />
+    <div class="datapicker">
+      <el-date-picker
+        v-model="dateRange"
+        type="daterange"
+        align="right"
+        unlink-panels
+        range-separator="to"
+        start-placeholder="Start Date"
+        end-placeholder="End Date"
+        :picker-options="pickerOptions"
+      >
+      </el-date-picker>
+      <el-button @click="submitDataRange(dateRange)"> Submit </el-button>
+    </div>
+    <line-chart v-bind:chartData="chartData" class="chartData"/>
   </div>
 </template>
 
 <script>
-  import LineChart from '@/components/LineChart';
-  import Vue from 'vue'
-  import { Component, Provide, Getter } from 'nuxt-property-decorator'
-  import queryAllJobsDelay from '~/apollo/queries/queryAllJobsDelay'
+import LineChart from '@/components/LineChart'
+import Vue from 'vue'
+import { Component, Provide, Getter, Emit } from 'nuxt-property-decorator'
+import queryAllJobsDelay from '~/apollo/queries/queryAllJobsDelay'
+import dateUtils from '~/utils/dateUtils'
 
-  @Component({
-    components: { LineChart },
-    apollo: {
-      chartData: {
-        query: queryAllJobsDelay,
-        variables() {
-          return { realm: this.realm }
-        },
-        update: data => data.allJobsDelay
+@Component({
+  components: { LineChart },
+})
+export default class Jobs extends Vue {
+  @Getter realm
+
+  @Provide()
+  pickerOptions = {
+    shortcuts: [
+      {
+        text: 'Last Week',
+        onClick(picker) {
+          const end = new Date()
+          const start = new Date()
+          start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+          picker.$emit('pick', [start, end])
+        }
+      },
+      {
+        text: 'Last Month',
+        onClick(picker) {
+          const end = new Date()
+          const start = new Date()
+          start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+          picker.$emit('pick', [start, end])
+        }
+      },
+      {
+        text: 'Last Quarter',
+        onClick(picker) {
+          const end = new Date()
+          const start = new Date()
+          start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+          picker.$emit('pick', [start, end])
+        }
       }
-    }
-  })
-  export default class Jobs extends Vue {
-    @Getter realm
-
-    @Provide()
-    aaa = [ { "snapshotDate": "2020-01-01", "delayDays": 148, "name": "namespace_shortName" }, { "snapshotDate": "2020-01-01", "delayDays": 149, "name": "namespace1_shortName1" } ]
-
+    ]
   }
+
+  @Provide()
+  chartData = []
+
+  @Provide()
+  dateRange = []
+
+  @Emit()
+  submitDataRange(dateRange) {
+    this.$apollo
+      .query({
+        query: queryAllJobsDelay,
+        variables: {
+          startDate: dateUtils.formatDate(this.dateRange[0]),
+          endDate: dateUtils.formatDate(this.dateRange[1]),
+          realm: this.realm
+        }
+      })
+      .then(({ data }) => {
+        this.chartData = data.allJobsDelay
+      })
+  }
+}
 </script>
+
+<style lang="scss" scoped>
+.datapicker {
+  margin-top: 35px;
+  margin-left: 500px;
+}
+
+.chartData {
+  margin-right: 100px;
+}
+</style>

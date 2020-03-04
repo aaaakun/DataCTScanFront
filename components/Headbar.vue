@@ -39,20 +39,18 @@
 
 <script>
 import Vue from 'vue'
-import { mapActions } from 'vuex'
-import { Component, Getter, Inject } from 'nuxt-property-decorator'
+import { Component, Getter, Inject, Action } from 'nuxt-property-decorator'
 
-@Component({
-  methods: {
-    ...mapActions(['toggleMenu', 'changeRealm', 'changeTeam'])
-  }
-})
+@Component()
 export default class Headbar extends Vue {
   @Getter isMenuHidden
   @Getter realm
   @Getter realms
   @Getter team
   @Getter teams
+  @Action toggleMenu
+  @Action changeRealm
+  @Action changeTeam
 }
 </script>
 

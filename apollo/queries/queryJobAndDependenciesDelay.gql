@@ -1,0 +1,12 @@
+query jobAndDependenciesDelay($job: JobQueryInput!, $realm: Realm!, $startDate: Date!, $endDate: Date!) {
+  jobAndDependenciesDelay(
+    job: $job
+    realm: $realm,
+    startDate: $startDate,
+    endDate: $endDate
+  ) {
+    snapshotDate,
+    delayDays,
+    name
+  }
+}

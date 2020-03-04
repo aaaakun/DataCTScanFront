@@ -5,6 +5,7 @@
         <el-row class="cascader" v-loading="loading">
           <el-col :span="8">
             <el-cascader-panel
+              :value='panelValue'
               :options="options"
               @change="onTypeChange"
             ></el-cascader-panel>
@@ -14,7 +15,7 @@
               :rules="typeProperties[type]['rules']"
               :ref="typeProperties[type]['formName']"
               :model="typeProperties[type]['form']"
-              label-width="120px"
+              label-width="200px"
             >
               <el-form-item
                 v-for="(value, key) in typeProperties[type]['form']"
@@ -22,23 +23,15 @@
                 :label="key"
                 :prop="key"
               >
-                <el-input
-                  v-model="typeProperties[type]['form'][key]"
-                ></el-input>
-              </el-form-item>
-              <el-form-item label="snapshotDate" prop="snapshotDate">
                 <el-date-picker
-                  v-model="typeProperties[type]['snapshotDate']"
+                  v-if="key === 'snapshotDate'"
+                  v-model="typeProperties[type]['form'][key]"
                   type="date"
                 >
                 </el-date-picker>
-              </el-form-item>
-              <el-form-item
-                label="completeTimes"
-                prop="completeTime"
-              >
                 <el-select
-                  v-model="typeProperties[type]['completeTime']"
+                  v-else-if="key === 'completeTime'"
+                  v-model="typeProperties[type]['form'][key]"
                 >
                   <el-option
                     v-for="item in completeTimes"
@@ -48,6 +41,26 @@
                   >
                   </el-option>
                 </el-select>
+                <el-input
+                  v-else
+                  v-model="typeProperties[type]['form'][key]"
+                ></el-input>
+              </el-form-item>
+              <el-form-item label="Show Successors:">
+                <el-switch
+                  v-model="showSuccessors"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                >
+                </el-switch>
+              </el-form-item>
+              <el-form-item label="Show Predecessors:">
+                <el-switch
+                  v-model="showPredecessors"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                >
+                </el-switch>
               </el-form-item>
               <el-form-item>
                 <el-button
@@ -62,7 +75,6 @@
         </el-row>
       </el-collapse-item>
     </el-collapse>
-
     <graph v-bind:graphData="graphData" />
   </div>
 </template>
@@ -70,11 +82,19 @@
 <script>
 import Graph from '@/components/Graph'
 import Vue from 'vue'
-import { Component, Provide, Emit, Getter } from 'nuxt-property-decorator'
+import {
+  Component,
+  Provide,
+  Emit,
+  Getter,
+  Action,
+  namespace
+} from 'nuxt-property-decorator'
 import gql from 'graphql-tag'
 import queryCompleteTimes from '~/apollo/queries/queryCompleteTimes'
 import queryLineage from '~/apollo/queries/queryLineage'
 import dateUtils from '~/utils/dateUtils'
+const LineageVuex = namespace('lineage')
 
 @Component({
   components: { Graph },
@@ -93,13 +113,23 @@ import dateUtils from '~/utils/dateUtils'
   }
 })
 export default class Lineage extends Vue {
+  @LineageVuex.Getter ddbForm
+  @LineageVuex.Getter s3Form
+  @LineageVuex.Getter glueForm
+  @LineageVuex.Getter edxForm
+  @LineageVuex.Getter jobForm
+  @LineageVuex.Getter type
+  @LineageVuex.Action setType
   @Getter realm
 
   @Provide()
-  activeNames = ['1']
+  showSuccessors = false
 
   @Provide()
-  type = ''
+  showPredecessors = false
+
+  @Provide()
+  activeNames = ['1']
 
   @Provide()
   loading = false
@@ -113,42 +143,44 @@ export default class Lineage extends Vue {
   @Provide()
   options = [
     {
-      value: 'Data',
+      value: 'data',
       label: 'Data',
       children: [
         {
-          value: 'EDX',
+          value: 'edx',
           label: 'EDX'
         },
         {
-          value: 'Glue',
+          value: 'glue',
           label: 'Glue'
         },
         {
-          value: 'DDB',
+          value: 'ddb',
           label: 'DDB'
         },
         {
-          value: 'S3',
+          value: 's3',
           label: 'S3'
         }
       ]
     },
     {
-      value: 'Job',
+      value: 'job',
       label: 'Job'
     }
   ]
 
   @Provide()
   typeProperties = {
-    Glue: {
-      formName: 'GlueForm',
+    glue: {
+      formName: 'glueForm',
       form: {
         AWSAccount: '',
         AWSRegion: '',
         database: '',
-        table: ''
+        table: '',
+        snapshotDate: '',
+        completeTime: ''
       },
       rules: {
         AWSAccount: [
@@ -173,16 +205,16 @@ export default class Lineage extends Vue {
         completeTime: [
           { validator: this.completeTimeValidator, trigger: 'blur' }
         ]
-      },
-      snapshotDate: '',
-      completeTime: ''
+      }
     },
-    EDX: {
-      formName: 'EDXForm',
+    edx: {
+      formName: 'edxForm',
       form: {
         provider: '',
         subject: '',
-        dataset: ''
+        dataset: '',
+        snapshotDate: '',
+        completeTime: ''
       },
       rules: {
         provider: [
@@ -200,15 +232,15 @@ export default class Lineage extends Vue {
         completeTime: [
           { validator: this.completeTimeValidator, trigger: 'blur' }
         ]
-      },
-      snapshotDate: '',
-      completeTime: ''
+      }
     },
-    S3: {
-      formName: 'S3Form',
+    s3: {
+      formName: 's3Form',
       form: {
         s3Bucket: '',
-        s3Prefix: ''
+        s3Prefix: '',
+        snapshotDate: '',
+        completeTime: ''
       },
       rules: {
         s3Bucket: [
@@ -223,16 +255,16 @@ export default class Lineage extends Vue {
         completeTime: [
           { validator: this.completeTimeValidator, trigger: 'blur' }
         ]
-      },
-      snapshotDate: '',
-      completeTime: ''
+      }
     },
-    DDB: {
-      formName: 'DDBForm',
+    ddb: {
+      formName: 'ddbForm',
       form: {
         AWSAccount: '',
         AWSRegion: '',
-        table: ''
+        table: '',
+        snapshotDate: '',
+        completeTime: ''
       },
       rules: {
         AWSAccount: [
@@ -254,15 +286,15 @@ export default class Lineage extends Vue {
         completeTime: [
           { validator: this.completeTimeValidator, trigger: 'blur' }
         ]
-      },
-      snapshotDate: '',
-      completeTime: ''
+      }
     },
-    Job: {
-      formName: 'JobForm',
+    job: {
+      formName: 'jobForm',
       form: {
         namespace: '',
-        shortName: ''
+        shortName: '',
+        snapshotDate: '',
+        completeTime: ''
       },
       rules: {
         namespace: [
@@ -277,40 +309,43 @@ export default class Lineage extends Vue {
         completeTime: [
           { validator: this.completeTimeValidator, trigger: 'blur' }
         ]
-      },
-      snapshotDate: '',
-      completeTime: ''
+      }
     }
   }
 
   get variables() {
-    if (this.type && this.typeProperties[this.type]['snapshotDate']) {
+    if (this.type) {
+      for(let key in this.typeProperties[this.type].form) {
+        if(key !== 'completeTime' && !this.typeProperties[this.type].form[key]) return undefined;
+      }
       const result = {
         realm: this.realm,
         snapshotDate: dateUtils.formatDate(
-          this.typeProperties[this.type]['snapshotDate']
+          this.typeProperties[this.type].form['snapshotDate']
         )
       }
-      switch (this.type) {
-        case 'DDB':
-          result.ddb = this.typeProperties.DDB.form
-          break
-        case 'Glue':
-          result.glue = this.typeProperties.Glue.form
-          break
-        case 'S3':
-          result.s3 = this.typeProperties.S3.form
-          break
-        case 'EDX':
-          result.edx = this.typeProperties.EDX.form
-          break
-        case 'Job':
-          result.job = this.typeProperties.Job.form
-          break
+      result[this.type] = {}
+      for(let key in this.typeProperties[this.type].form) {
+        if(key !== 'completeTime' && key !== 'snapshotDate') {
+          result[this.type][key] = this.typeProperties[this.type].form[key]
+        }
       }
       return result
     }
     return undefined
+  }
+
+  get panelValue() {
+
+    switch(this.type) {
+      case 's3':
+      case 'edx':
+      case 'glue':
+      case 'ddb': 
+      return ['data', this.type];
+      default: return [this.type]
+    }
+
   }
 
   @Emit()
@@ -321,14 +356,13 @@ export default class Lineage extends Vue {
           .query({
             query: queryLineage,
             variables: Object.assign(this.variables, {
-              completeTime: this.typeProperties[this.type]['completeTime']
+              completeTime: this.typeProperties[this.type].form['completeTime'],
+              showSuccessors: this.showSuccessors,
+              showPredecessors: this.showPredecessors
             })
           })
           .then(({ data }) => {
-            data.lineage.nodes.forEach(node => {
-              node.snapshotDate = new Date(node.snapshotDate)
-              node.completeTime = new Date(node.completeTime)
-            })
+            dateUtils.parseDateForGraphNode(data.lineage.nodes)
             this.graphData = data.lineage
             this.activeNames = []
           })
@@ -341,7 +375,7 @@ export default class Lineage extends Vue {
 
   @Emit()
   snapshotDateValidator(rule, value, callback) {
-    if (!this.type || this.typeProperties[this.type]['snapshotDate'] === '') {
+    if (!this.type || this.typeProperties[this.type].form['snapshotDate'] === '') {
       callback(new Error('Please input snapshotDate'))
     } else {
       callback()
@@ -350,13 +384,13 @@ export default class Lineage extends Vue {
 
   @Emit()
   completeTimeValidator(rule, value, callback) {
-    if (!this.type || !this.typeProperties[this.type]['completeTime']) {
+    if (!this.type || !this.typeProperties[this.type].form['completeTime']) {
       callback(new Error('Please input completeTime'))
     } else if (
       !this.completeTimes ||
       this.completeTimes.length === 0 ||
       !this.completeTimes.includes(
-        this.typeProperties[this.type]['completeTime']
+        this.typeProperties[this.type].form['completeTime']
       )
     ) {
       callback(new Error('Invaild completeTime'))
@@ -367,7 +401,21 @@ export default class Lineage extends Vue {
 
   @Emit()
   onTypeChange(value) {
-    this.type = value[value.length - 1]
+    this.setType(value[value.length - 1])
+  }
+
+  mounted() {
+    const formMap = new Map()
+    formMap.set(this.typeProperties.ddb.form, this.ddbForm);
+    formMap.set(this.typeProperties.glue.form, this.glueForm);
+    formMap.set(this.typeProperties.edx.form, this.edxForm);
+    formMap.set(this.typeProperties.s3.form, this.s3Form);
+    formMap.set(this.typeProperties.job.form, this.jobForm);
+    for(let type in this.typeProperties) {
+      for(let key in this.typeProperties[type].form) {
+        this.typeProperties[type].form[key] = formMap.get(this.typeProperties[type].form)[key]
+      }
+    }
   }
 }
 </script>

@@ -9,8 +9,7 @@
 </template>
 <script>
   import Vue from 'vue'
-  import { mapActions } from 'vuex'
-  import { Component, Getter, Provide, Emit, Prop, Watch } from 'nuxt-property-decorator'
+  import { Component, Provide, Emit, Prop, Watch } from 'nuxt-property-decorator'
   import NodeInfo from '@/components/NodeInfo';
 
   @Component({
@@ -137,7 +136,7 @@
       // Config graph engine in brower
       if (process.client) {
         const width = document.getElementById('graphContainer').scrollWidth;
-        const height = document.getElementById('graphContainer').scrollHeight || 700;
+        const height = document.getElementById('graphContainer').scrollHeight || 500;
         const G6 = require('@antv/g6');
         this.graph = new G6.Graph({
           container: 'graphContainer',
@@ -150,14 +149,27 @@
             rankdir: 'LR',
             nodesep: 5,
             ranksep: 20
-            
           },
           modes: {
             default: [ 'drag-canvas', 'activate-relations', 'zoom-canvas' ]
           },
           defaultNode: {
             type: 'modelRect',
-            size: [ 270, 80 ]
+            size: [ 270, 80 ],
+            labelCfg: {
+              style: {
+                fill: '#000000',
+                fontSize: 12,
+              },
+              offset: 30,
+            },
+            descriptionCfg: {
+              style: {
+                fontSize: 12,
+                fill: '#000000'
+              },
+              paddingTop: 0
+            },
           },
           nodeStateStyles: {
             hover: {

@@ -13,5 +13,16 @@ export default {
         day = '0' + day;
 
     return [year, month, day].join('-');
+  },
+
+  parseDateForGraphNode (nodes) {
+    nodes.forEach(node => {
+      node.snapshotDate = new Date(node.snapshotDate.replace(/-/g,"/"))
+      node.completeTime = new Date(node.completeTime)
+      if(node.storage && node.storage.startTime) {
+        node.storage.startTime = new Date(node.storage.startTime)
+      }
+    })
   }
+
 }

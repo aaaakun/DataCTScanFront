@@ -52,6 +52,7 @@ import {
 import gql from 'graphql-tag'
 import queryWorkflowVersions from '~/apollo/queries/queryWorkflowVersions'
 import queryGraphByWorkflow from '~/apollo/queries/queryGraphByWorkflow'
+import dateUtils from '~/utils/dateUtils'
 
 @Component({
   components: { Graph },
@@ -114,10 +115,7 @@ export default class Workflow extends Vue {
             }
           })
           .then(({ data }) => {
-            data.workflowGraph.nodes.forEach(node => {
-              node.snapshotDate = new Date(node.snapshotDate)
-              node.completeTime = new Date(node.completeTime)
-            })
+            dateUtils.parseDateForGraphNode(data.workflowGraph.nodes)
             this.graphData = data.workflowGraph
           })
       } else {

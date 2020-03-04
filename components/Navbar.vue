@@ -44,20 +44,17 @@
 
 <script>
 import Vue from 'vue'
-import { mapActions } from 'vuex'
-import { Component, Getter, namespace } from 'nuxt-property-decorator'
+import { Component, Getter, namespace, Action } from 'nuxt-property-decorator'
 
 const Menu = namespace('menu')
 
-@Component({
-  methods: {
-    ...mapActions(['toggleMenu'])
-  }
-})
+@Component()
 export default class Navbar extends Vue {
   @Getter isMenuHidden
 
   @Getter menus
+
+  @Action toggleMenu
 }
 </script>
 

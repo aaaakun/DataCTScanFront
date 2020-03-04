@@ -35,7 +35,10 @@ query timeWindowGraph($realm: Realm!, $startTime: DateTime!, $endTime: DateTime!
             s3Prefix
           }
           ... on JobRef {
+            namespace
+            shortName
             codeRef
+            startTime
           }
         }
       },

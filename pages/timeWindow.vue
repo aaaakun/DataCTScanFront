@@ -23,6 +23,7 @@ import Vue from 'vue'
 import { Component, Provide, Emit, Getter } from 'nuxt-property-decorator'
 import gql from 'graphql-tag'
 import queryGraphByTimeWindow from '~/apollo/queries/queryGraphByTimeWindow'
+import dateUtils from '~/utils/dateUtils'
 
 @Component({
   components: { Graph }
@@ -82,11 +83,9 @@ export default class TimeWindow extends Vue {
         }
       })
       .then(({ data }) => {
-        data.timeWindowGraph.nodes.forEach(node => {
-          node.snapshotDate = new Date(node.snapshotDate)
-          node.completeTime = new Date(node.completeTime)
-        })
-        this.graphData = data.timeWindowGraph
+        const dataCopy = JSON.parse(JSON.stringify(data))
+        dateUtils.parseDateForGraphNode(dataCopy.timeWindowGraph.nodes);
+        this.graphData = dataCopy.timeWindowGraph
       })
   }
 }
@@ -95,6 +94,6 @@ export default class TimeWindow extends Vue {
 <style lang="scss" scoped>
 .datapicker {
   margin-top: 35px;
-  margin-left: 300px;
+  margin-left: 500px;
 }
 </style>
