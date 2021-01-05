@@ -17,7 +17,7 @@
     "@antv/g6": "^3.3.6",
     "@nuxtjs/apollo": "^4.0.0-rc19",
     "@nuxtjs/axios": "^5.9.5",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "element-ui": "^2.4.11",
     "express": "^4.16.4",
     "graphql-tag": "^2.10.3",
